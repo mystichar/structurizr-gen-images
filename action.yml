@@ -18,7 +18,7 @@ inputs:
   image-type:
     description: 'Type of image to generate, either png or svg'
     required: true
-    default: 'png'
+    default: 'svg'
 
 runs:
   using: 'composite'
@@ -58,8 +58,20 @@ runs:
 
     - name: Check for Changes
       id: check_changes
+      if : ${{ inputs.image-type == 'png' }}
       run: |
         git add *.png
+        if git diff --staged --quiet; then
+          echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+        else
+          echo "CHANGES_EXIST=true" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Check for Changes
+      id: check_changes
+      if : ${{ inputs.image-type == 'svg' }}
+      run: |
         git add *.svg
         if git diff --staged --quiet; then
           echo "CHANGES_EXIST=false" >> $GITHUB_ENV
