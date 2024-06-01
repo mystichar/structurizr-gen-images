@@ -31,6 +31,7 @@ runs:
       shell: bash
 
     - name: Generate Diagram Images
+      if : ${{ inputs.image-type == 'png' }}
       run: |
         echo "Actual folder is"
         echo $PWD
@@ -40,10 +41,22 @@ runs:
         plantuml -tpng *.puml
       shell: bash
 
+    - name: Generate Diagram Images
+      if : ${{ inputs.image-type == 'svg' }}
+      run: |
+        echo "Actual folder is"
+        echo $PWD
+        /usr/local/structurizr-cli/structurizr.sh export -workspace ${{ inputs.workspace-path }} -format plantuml -output ${{ inputs.output-path }}
+        cd ${{ inputs.output-path }}
+        echo 'Generating SVGs...'
+        plantuml -tsvg *.puml
+      shell: bash
+
     - name: Check for Changes
       id: check_changes
       run: |
         git add *.png
+        git add *.svg
         if git diff --staged --quiet; then
           echo "CHANGES_EXIST=false" >> $GITHUB_ENV
         else
