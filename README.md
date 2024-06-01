@@ -64,7 +64,7 @@ This action does not produces any output.
 ## Additional Notes
 
 - Ensure that the `workspace.dsl` file is correctly set up and located in the specified path.
-- The action will check for changes in the diagram images and update them if necessary. 
+- The action will check for changes in the diagram images and update them if necessary.
 - Generated diagrams are committed and pushed to the same branch that initiated the pull request. Of course, if your diagram does not change, there will be no commit.
 
 ## Contributing

@@ -1,69 +1,8 @@
 name: 'Generate Structurizr Diagrams Images from DSL'
 description: 'Automatically generates and updates Structurizr diagrams images on pull requests that modifies DSL.'
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  check-trigger:
-    runs-on: ubuntu-latest
-    outputs:
-      proceed: ${{ steps.check-trigger.outputs.proceed }}
-    steps:
-    - name: Check Trigger Condition
-      id: check-trigger
-      run: |
-        if [ "${{ github.event_name }}" = "${{ env.TRIGGER_EVENT_TYPE }}" ]; then
-          echo "::set-output name=proceed::true"
-        else
-          echo "::set-output name=proceed::false"
-        fi
-      env:
-        TRIGGER_EVENT_TYPE: ${{ inputs.trigger-event-type }}
-
-  generate-diagrams:
-    needs: check-trigger
-    if: needs.check-trigger.outputs.proceed == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Setup Git
-        run: git config --global --add safe.directory $PWD
-
-      - name: Generate Diagram Images
-        run: |
-          echo "Actual folder is"
-          echo $PWD
-          /usr/local/structurizr-cli/structurizr.sh export -workspace ${{ inputs.workspace-path }} -format plantuml -output ${{ inputs.output-path }}
-          cd ${{ inputs.output-path }}
-          echo 'Generating PNGs...'
-          plantuml -tpng *.puml
-
-      - name: Check for Changes
-        id: check_changes
-        run: |
-          git add *.png
-          if git diff --staged --quiet; then
-            echo "CHANGES_EXIST=false" >> $GITHUB_ENV
-          else
-            echo "CHANGES_EXIST=true" >> $GITHUB_ENV
-
-      - name: Commit and Push Diagrams
-        if: env.CHANGES_EXIST == 'true'
-        run: |
-          git config --global user.name github-actions
-          git config --global user.email github-actions@github.com
-          git commit -m "chores(C4 diagrams): Update Structurizr diagrams"
-          git push origin HEAD:${GITHUB_HEAD_REF}
-
+branding:
+  icon: 'activity'
+  color: 'white'
 inputs:
   repo-token:
     description: 'GITHUB_TOKEN from secrets'
@@ -76,6 +15,56 @@ inputs:
     description: 'Path to the generated images'
     required: true
     default: 'docs/diagrams'
-  trigger-event-type:
-    description: 'Event type that triggers this action (push or pull_request)'
-    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
+    - name: Setup Git
+      run: git config --global --add safe.directory $PWD
+      shell: bash
+
+    - name: Generate Diagram Images
+      run: |
+        echo "Actual folder is"
+        echo $PWD
+        /usr/local/structurizr-cli/structurizr.sh export -workspace ${{ inputs.workspace-path }} -format plantuml -output ${{ inputs.output-path }}
+        cd ${{ inputs.output-path }}
+        echo 'Generating PNGs...'
+        plantuml -tpng *.puml
+      shell: bash
+
+    - name: Check for Changes
+      id: check_changes
+      run: |
+        git add *.png
+        if git diff --staged --quiet; then
+          echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+        else
+          echo "CHANGES_EXIST=true" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Commit and Push Diagrams
+      if: env.CHANGES_EXIST == 'true' && github.event_name  == 'pull_request'
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }} 
+      run: |
+        git config --global user.name github-actions
+        git config --global user.email github-actions@github.com
+        git commit -m "chores(C4 diagrams): Update Structurizr diagrams"
+        git push origin HEAD:${GITHUB_HEAD_REF}
+      shell: bash
+
+    - name: Commit and Push Diagrams on Push
+      if: steps.check_changes.outputs.changes_exist == 'true' && github.event_name  == 'push'
+      run: |
+        git commit -m "chores(C4 diagrams): Update Structurizr diagrams on Push"
+        git push
+      shell: bash
