@@ -60,6 +60,8 @@ runs:
     - name: Check for Changes PNG
       id: check_changes_png
       if : ${{ inputs.image-type == 'png' }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }} 
       run: |
         git add *.png
         if git diff --staged --quiet; then
@@ -74,6 +76,8 @@ runs:
     - name: Check for Changes SVG
       id: check_changes_svg
       if : ${{ inputs.image-type == 'svg' }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }} 
       run: |
         git add *.svg
         if git diff --staged --quiet; then
