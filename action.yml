@@ -15,6 +15,10 @@ inputs:
     description: 'Path to the generated images'
     required: true
     default: 'docs/diagrams'
+  image-type:
+    description: 'Type of image to generate, either png or svg'
+    required: true
+    default: 'png'
 
 runs:
   using: 'composite'
