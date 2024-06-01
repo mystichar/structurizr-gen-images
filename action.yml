@@ -99,8 +99,6 @@ runs:
     - name: Commit and Push Diagrams on Push
       if: steps.check_changes.outputs.changes_exist == 'true' && github.event_name  == 'push'
       run: |
-        git config --global user.name github-actions
-        git config --global user.email github-actions@github.com
         git commit -m "chores(C4 diagrams): Update Structurizr diagrams on Push"
         git push
       shell: bash
