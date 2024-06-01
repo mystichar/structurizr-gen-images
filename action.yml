@@ -68,8 +68,9 @@ runs:
           echo "No changes to commit."
         else
           echo "Changes detected, committing..."
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
           git commit -m "Update Structurizr diagrams: SVG diagrams updated"
-          git push
         fi
       shell: bash
 
@@ -84,8 +85,9 @@ runs:
           echo "No changes to commit."
         else
           echo "Changes detected, committing..."
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
           git commit -m "Update Structurizr diagrams: SVG diagrams updated"
-          git push
         fi
       shell: bash
 
@@ -94,15 +96,11 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.repo-token }} 
       run: |
-        git config --global user.name github-actions
-        git config --global user.email github-actions@github.com
-        git commit -m "chores(C4 diagrams): Update Structurizr diagrams"
         git push origin HEAD:${GITHUB_HEAD_REF}
       shell: bash
 
     - name: Commit and Push Diagrams on Push
       if: steps.check_changes.outputs.changes_exist == 'true' && github.event_name  == 'push'
       run: |
-        git commit -m "chores(C4 diagrams): Update Structurizr diagrams on Push"
         git push
       shell: bash
