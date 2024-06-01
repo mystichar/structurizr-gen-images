@@ -100,11 +100,13 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.repo-token }} 
       run: |
+        echo "Committing and pushing diagrams..."
         git push origin HEAD:${GITHUB_HEAD_REF}
       shell: bash
 
     - name: Commit and Push Diagrams on Push
       if: steps.check_changes.outputs.changes_exist == 'true' && github.event_name  == 'push'
       run: |
+        echo "Committing and pushing diagrams..."
         git push
       shell: bash
