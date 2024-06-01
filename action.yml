@@ -62,10 +62,13 @@ runs:
       if : ${{ inputs.image-type == 'png' }}
       run: |
         git add *.png
+        git status
         if git diff --staged --quiet; then
-          echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+          echo "No changes to commit."
         else
-          echo "CHANGES_EXIST=true" >> $GITHUB_ENV
+          echo "Changes detected, committing..."
+          git commit -m "Update Structurizr diagrams: SVG diagrams updated"
+          git push
         fi
       shell: bash
 
@@ -74,10 +77,13 @@ runs:
       if : ${{ inputs.image-type == 'svg' }}
       run: |
         git add *.svg
+        git status
         if git diff --staged --quiet; then
-          echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+          echo "No changes to commit."
         else
-          echo "CHANGES_EXIST=true" >> $GITHUB_ENV
+          echo "Changes detected, committing..."
+          git commit -m "Update Structurizr diagrams: SVG diagrams updated"
+          git push
         fi
       shell: bash
 
@@ -95,6 +101,8 @@ runs:
     - name: Commit and Push Diagrams on Push
       if: steps.check_changes.outputs.changes_exist == 'true' && github.event_name  == 'push'
       run: |
+        git config --global user.name github-actions
+        git config --global user.email github-actions@github.com
         git commit -m "chores(C4 diagrams): Update Structurizr diagrams on Push"
         git push
       shell: bash
