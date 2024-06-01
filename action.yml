@@ -105,7 +105,7 @@ runs:
       shell: bash
 
     - name: Commit and Push Diagrams on Push
-      if: steps.check_changes.outputs.changes_exist == 'true' && github.event_name  == 'push'
+      if: github.event_name  == 'push'
       run: |
         echo "Committing and pushing diagrams..."
         git push
