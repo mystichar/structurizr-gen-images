@@ -54,6 +54,7 @@ runs:
         cd ${{ inputs.output-path }}
         echo 'Generating SVGs...'
         plantuml -tsvg *.puml
+        ls -la
       shell: bash
 
     - name: Check for Changes PNG
