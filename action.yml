@@ -56,8 +56,8 @@ runs:
         plantuml -tsvg *.puml
       shell: bash
 
-    - name: Check for Changes
-      id: check_changes
+    - name: Check for Changes PNG
+      id: check_changes_png
       if : ${{ inputs.image-type == 'png' }}
       run: |
         git add *.png
@@ -68,8 +68,8 @@ runs:
         fi
       shell: bash
 
-    - name: Check for Changes
-      id: check_changes
+    - name: Check for Changes SVG
+      id: check_changes_svg
       if : ${{ inputs.image-type == 'svg' }}
       run: |
         git add *.svg
